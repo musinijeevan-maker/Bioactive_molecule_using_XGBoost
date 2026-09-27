@@ -1,0 +1,79 @@
+{
+  "best_model_name": "XGBoost",
+  "label_mapping": {
+    "active": 1,
+    "inactive": 0
+  },
+  "reverse_mapping": {
+    "1": "active",
+    "0": "inactive"
+  },
+  "fingerprint_radius": 2,
+  "fingerprint_bits": 2048,
+  "data_source": "raw",
+  "activity_threshold_nm": 10000,
+  "split": "70% development / 30% holdout",
+  "cv_folds": 10,
+  "selection_metric": "Holdout F1-score",
+  "best_metrics": {
+    "cv_f1_mean": 0.8868,
+    "holdout_f1": 0.8869,
+    "accuracy": 0.8302,
+    "auc": 0.8699,
+    "precision": 0.8636,
+    "recall": 0.9116,
+    "specificity": 0.6098
+  },
+  "all_results": [
+    {
+      "Model": "XGBoost",
+      "Mean CV F1": 0.8868,
+      "Accuracy": 0.8302,
+      "Precision": 0.8636,
+      "Recall": 0.9116,
+      "Specificity": 0.6098,
+      "Holdout F1": 0.8869,
+      "ROC-AUC": 0.8699
+    },
+    {
+      "Model": "Random Forest",
+      "Mean CV F1": 0.892,
+      "Accuracy": 0.8214,
+      "Precision": 0.8499,
+      "Recall": 0.9176,
+      "Specificity": 0.5608,
+      "Holdout F1": 0.8824,
+      "ROC-AUC": 0.8639
+    },
+    {
+      "Model": "Linear SVM",
+      "Mean CV F1": 0.8599,
+      "Accuracy": 0.7877,
+      "Precision": 0.8537,
+      "Recall": 0.856,
+      "Specificity": 0.6025,
+      "Holdout F1": 0.8548,
+      "ROC-AUC": 0.7843
+    },
+    {
+      "Model": "Naive Bayes",
+      "Mean CV F1": 0.5325,
+      "Accuracy": 0.5313,
+      "Precision": 0.886,
+      "Recall": 0.4113,
+      "Specificity": 0.8566,
+      "Holdout F1": 0.5618,
+      "ROC-AUC": 0.7544
+    },
+    {
+      "Model": "RBF Network",
+      "Mean CV F1": 0.8232,
+      "Accuracy": 0.7006,
+      "Precision": 0.7414,
+      "Recall": 0.9062,
+      "Specificity": 0.1434,
+      "Holdout F1": 0.8156,
+      "ROC-AUC": 0.581
+    }
+  ]
+}
