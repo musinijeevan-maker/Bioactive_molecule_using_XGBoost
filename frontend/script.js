@@ -267,3 +267,333 @@ if (smilesInput) {
     }
   });
 }
+
+// ============================================================
+// 10. INTERACTIVE DIAGNOSTICS STUDIO LOGIC & CHARTS
+// ============================================================
+
+// --- Studio Tabs Switching ---
+const studioTabBtns = document.querySelectorAll('.studio-tab-btn');
+const tabPanels = document.querySelectorAll('.tab-content-panel');
+
+studioTabBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const targetTabId = btn.getAttribute('data-tab');
+    
+    studioTabBtns.forEach(b => b.classList.remove('active'));
+    tabPanels.forEach(p => p.classList.remove('active'));
+    
+    btn.classList.add('active');
+    const targetPanel = document.getElementById(targetTabId);
+    if (targetPanel) {
+      targetPanel.classList.add('active');
+    }
+
+    // Trigger chart render on tab switch if needed
+    if (targetTabId === 'tab-roc' && !rocChartInstance) {
+      initRocChart();
+    } else if (targetTabId === 'tab-benchmark' && !benchmarkChartInstance) {
+      initBenchmarkChart();
+    } else if (targetTabId === 'tab-radar' && !radarChartInstance) {
+      initRadarChart();
+    }
+  });
+});
+
+// --- Confusion Matrix Raw Count vs Percentage Toggle ---
+const cmCountBtn = document.getElementById('cmCountBtn');
+const cmPercentBtn = document.getElementById('cmPercentBtn');
+const cmCells = [
+  document.getElementById('cmTN'),
+  document.getElementById('cmFP'),
+  document.getElementById('cmFN'),
+  document.getElementById('cmTP')
+];
+
+if (cmCountBtn && cmPercentBtn) {
+  cmCountBtn.addEventListener('click', () => {
+    cmCountBtn.classList.add('active');
+    cmPercentBtn.classList.remove('active');
+    cmCells.forEach(cell => {
+      if (cell) cell.textContent = cell.getAttribute('data-raw');
+    });
+  });
+
+  cmPercentBtn.addEventListener('click', () => {
+    cmPercentBtn.classList.add('active');
+    cmCountBtn.classList.remove('active');
+    cmCells.forEach(cell => {
+      if (cell) cell.textContent = cell.getAttribute('data-pct');
+    });
+  });
+}
+
+// --- Chart Instances ---
+let rocChartInstance = null;
+let benchmarkChartInstance = null;
+let radarChartInstance = null;
+
+// 1. Dynamic ROC Curve
+function initRocChart() {
+  const canvas = document.getElementById('rocChartCanvas');
+  if (!canvas || typeof Chart === 'undefined') return;
+
+  const ctx = canvas.getContext('2d');
+  rocChartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ['0.0', '0.1', '0.2', '0.3', '0.4', '0.5', '0.6', '0.7', '0.8', '0.9', '1.0'],
+      datasets: [
+        {
+          label: 'XGBoost (AUC = 0.8699)',
+          data: [
+            {x: 0.0, y: 0.0},
+            {x: 0.04, y: 0.46},
+            {x: 0.08, y: 0.65},
+            {x: 0.15, y: 0.78},
+            {x: 0.25, y: 0.88},
+            {x: 0.39, y: 0.912},
+            {x: 0.55, y: 0.96},
+            {x: 0.75, y: 0.985},
+            {x: 1.0, y: 1.0}
+          ],
+          borderColor: '#1a6fdb',
+          backgroundColor: 'rgba(26, 111, 219, 0.12)',
+          fill: true,
+          tension: 0.35,
+          borderWidth: 3,
+          pointRadius: 4,
+          pointHoverRadius: 7
+        },
+        {
+          label: 'Random Forest (AUC = 0.8639)',
+          data: [
+            {x: 0.0, y: 0.0},
+            {x: 0.06, y: 0.42},
+            {x: 0.12, y: 0.62},
+            {x: 0.20, y: 0.75},
+            {x: 0.32, y: 0.86},
+            {x: 0.44, y: 0.918},
+            {x: 0.60, y: 0.95},
+            {x: 0.80, y: 0.98},
+            {x: 1.0, y: 1.0}
+          ],
+          borderColor: '#0d9488',
+          borderDash: [6, 4],
+          backgroundColor: 'transparent',
+          fill: false,
+          tension: 0.35,
+          borderWidth: 2.5,
+          pointRadius: 3,
+          pointHoverRadius: 6
+        },
+        {
+          label: 'Random Chance (AUC = 0.50)',
+          data: [{x: 0, y: 0}, {x: 1, y: 1}],
+          borderColor: '#94a3b8',
+          borderDash: [4, 4],
+          borderWidth: 1.5,
+          pointRadius: 0,
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1200,
+        easing: 'easeOutQuart'
+      },
+      scales: {
+        x: {
+          type: 'linear',
+          min: 0,
+          max: 1,
+          title: {
+            display: true,
+            text: 'False Positive Rate (1 - Specificity)',
+            font: { weight: 'bold', size: 12 }
+          },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        y: {
+          min: 0,
+          max: 1,
+          title: {
+            display: true,
+            text: 'True Positive Rate (Sensitivity / Recall)',
+            font: { weight: 'bold', size: 12 }
+          },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 14, font: { weight: '600' } }
+        },
+        tooltip: {
+          callbacks: {
+            label: function(ctx) {
+              return ${ctx.dataset.label}: TPR=%, FPR=%;
+            }
+          }
+        }
+      }
+    }
+  });
+}
+
+// 2. Multi-Model Benchmark Chart
+function initBenchmarkChart() {
+  const canvas = document.getElementById('benchmarkChartCanvas');
+  if (!canvas || typeof Chart === 'undefined') return;
+
+  const ctx = canvas.getContext('2d');
+  const models = ['XGBoost', 'Random Forest', 'Linear SVM', 'RBF Network', 'Naive Bayes'];
+  
+  const allDatasets = [
+    {
+      label: 'Holdout F1-Score',
+      data: [0.8869, 0.8824, 0.8548, 0.8156, 0.5618],
+      backgroundColor: '#1a6fdb',
+      borderRadius: 6
+    },
+    {
+      label: 'Accuracy',
+      data: [0.8302, 0.8214, 0.7877, 0.7006, 0.5313],
+      backgroundColor: '#0d9488',
+      borderRadius: 6
+    },
+    {
+      label: 'ROC-AUC',
+      data: [0.8699, 0.8639, 0.7843, 0.5810, 0.7544],
+      backgroundColor: '#6366f1',
+      borderRadius: 6
+    }
+  ];
+
+  benchmarkChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: models,
+      datasets: allDatasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
+      scales: {
+        y: {
+          min: 0,
+          max: 1.0,
+          ticks: {
+            callback: value => (value * 100) + '%'
+          },
+          grid: { color: 'rgba(0,0,0,0.05)' }
+        },
+        x: {
+          grid: { display: false },
+          ticks: { font: { weight: '600' } }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 14, font: { weight: '600' } }
+        }
+      }
+    }
+  });
+
+  // Filter Chips Handler
+  const chips = document.querySelectorAll('.chart-chip');
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      chips.forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+      const metric = chip.getAttribute('data-metric');
+
+      if (metric === 'all') {
+        benchmarkChartInstance.data.datasets = allDatasets;
+      } else if (metric === 'f1') {
+        benchmarkChartInstance.data.datasets = [allDatasets[0]];
+      } else if (metric === 'acc') {
+        benchmarkChartInstance.data.datasets = [allDatasets[1]];
+      } else if (metric === 'auc') {
+        benchmarkChartInstance.data.datasets = [allDatasets[2]];
+      }
+      benchmarkChartInstance.update();
+    });
+  });
+}
+
+// 3. Multi-Metric Spider Radar Chart
+function initRadarChart() {
+  const canvas = document.getElementById('radarChartCanvas');
+  if (!canvas || typeof Chart === 'undefined') return;
+
+  const ctx = canvas.getContext('2d');
+  radarChartInstance = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Accuracy', 'Precision', 'Recall (Sensitivity)', 'Specificity', 'Holdout F1', 'ROC-AUC'],
+      datasets: [
+        {
+          label: 'XGBoost (Winner)',
+          data: [0.8302, 0.8636, 0.9116, 0.6098, 0.8869, 0.8699],
+          borderColor: '#1a6fdb',
+          backgroundColor: 'rgba(26, 111, 219, 0.25)',
+          borderWidth: 2.5,
+          pointBackgroundColor: '#1a6fdb',
+          pointRadius: 4
+        },
+        {
+          label: 'Random Forest',
+          data: [0.8214, 0.8499, 0.9176, 0.5608, 0.8824, 0.8639],
+          borderColor: '#0d9488',
+          backgroundColor: 'rgba(13, 148, 136, 0.15)',
+          borderWidth: 2,
+          pointBackgroundColor: '#0d9488',
+          pointRadius: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: {
+        duration: 1200,
+        easing: 'easeOutQuart'
+      },
+      scales: {
+        r: {
+          min: 0,
+          max: 1.0,
+          ticks: {
+            stepSize: 0.2,
+            callback: value => (value * 100) + '%'
+          },
+          pointLabels: {
+            font: { size: 12, weight: '600' }
+          }
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: { boxWidth: 14, font: { weight: '600' } }
+        }
+      }
+    }
+  });
+}
+
+// Auto-initialize charts on DOM load
+document.addEventListener('DOMContentLoaded', () => {
+  // Pre-load active tab chart if needed
+});

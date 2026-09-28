@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Bioactive Molecule Predictor</title>
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -218,6 +219,9 @@
   <!-- ====================================================
        MODELS & BENCHMARK RESULTS
        ==================================================== -->
+    <!-- ====================================================
+       MODELS & BENCHMARK RESULTS
+       ==================================================== -->
   <section id="models" style="background:var(--bg);">
     <div class="container">
       <div class="section-label">Experiments</div>
@@ -225,7 +229,7 @@
       <p class="section-desc">
         All 5 models were trained following the base paper's methodology:
         <strong>70% Development (with 10-fold Stratified Cross-Validation)</strong> and evaluated on an
-        <strong>untouched 30% Holdout dataset</strong> (2,052 molecules).
+        <strong>untouched 30% Holdout dataset</strong> (2,044 molecules).
       </p>
 
       <div style="overflow-x:auto; margin-top:28px;">
@@ -246,101 +250,246 @@
           <tbody>
             <tr style="border-top:1px solid var(--border); background:#f0fdf4; font-weight:600;">
               <td style="padding:12px 14px;">XGBoost</td>
-              <td style="padding:12px 14px;">0.8853</td>
-              <td style="padding:12px 14px;">82.55%</td>
-              <td style="padding:12px 14px;">0.8400</td>
-              <td style="padding:12px 14px;">0.9407</td>
-              <td style="padding:12px 14px;">0.5118</td>
-              <td style="padding:12px 14px; color:var(--success);">0.8875</td>
-              <td style="padding:12px 14px;">0.8677</td>
+              <td style="padding:12px 14px;">0.8868</td>
+              <td style="padding:12px 14px;">83.02%</td>
+              <td style="padding:12px 14px;">0.8636</td>
+              <td style="padding:12px 14px;">0.9116</td>
+              <td style="padding:12px 14px;">0.6098</td>
+              <td style="padding:12px 14px; color:var(--success);">0.8869</td>
+              <td style="padding:12px 14px;">0.8699</td>
               <td style="padding:12px 14px;"><span style="background:#dcfce7; color:var(--success); padding:3px 8px; border-radius:12px; font-size:0.78rem;">Selected Best</span></td>
             </tr>
             <tr style="border-top:1px solid var(--border);">
               <td style="padding:12px 14px;">Random Forest</td>
-              <td style="padding:12px 14px;">0.8936</td>
-              <td style="padding:12px 14px;">82.36%</td>
-              <td style="padding:12px 14px;">0.8458</td>
-              <td style="padding:12px 14px;">0.9280</td>
-              <td style="padding:12px 14px;">0.5390</td>
-              <td style="padding:12px 14px;">0.8850</td>
-              <td style="padding:12px 14px;">0.8620</td>
+              <td style="padding:12px 14px;">0.8920</td>
+              <td style="padding:12px 14px;">82.14%</td>
+              <td style="padding:12px 14px;">0.8499</td>
+              <td style="padding:12px 14px;">0.9176</td>
+              <td style="padding:12px 14px;">0.5608</td>
+              <td style="padding:12px 14px;">0.8824</td>
+              <td style="padding:12px 14px;">0.8639</td>
               <td style="padding:12px 14px;"><span style="background:#eef3fb; color:var(--primary); padding:3px 8px; border-radius:12px; font-size:0.78rem;">Ensemble Baseline</span></td>
             </tr>
             <tr style="border-top:1px solid var(--border);">
               <td style="padding:12px 14px;">Linear SVM</td>
-              <td style="padding:12px 14px;">0.8585</td>
-              <td style="padding:12px 14px;">78.41%</td>
-              <td style="padding:12px 14px;">0.8550</td>
-              <td style="padding:12px 14px;">0.8488</td>
-              <td style="padding:12px 14px;">0.6080</td>
-              <td style="padding:12px 14px;">0.8519</td>
-              <td style="padding:12px 14px;">0.7867</td>
+              <td style="padding:12px 14px;">0.8599</td>
+              <td style="padding:12px 14px;">78.77%</td>
+              <td style="padding:12px 14px;">0.8537</td>
+              <td style="padding:12px 14px;">0.8560</td>
+              <td style="padding:12px 14px;">0.6025</td>
+              <td style="padding:12px 14px;">0.8548</td>
+              <td style="padding:12px 14px;">0.7843</td>
               <td style="padding:12px 14px;"><span style="color:var(--muted); font-size:0.8rem;">Linear Baseline</span></td>
             </tr>
             <tr style="border-top:1px solid var(--border);">
               <td style="padding:12px 14px;">RBF Network</td>
-              <td style="padding:12px 14px;">0.8168</td>
-              <td style="padding:12px 14px;">71.64%</td>
-              <td style="padding:12px 14px;">0.7407</td>
-              <td style="padding:12px 14px;">0.9420</td>
-              <td style="padding:12px 14px;">0.1016</td>
-              <td style="padding:12px 14px;">0.8293</td>
-              <td style="padding:12px 14px;">0.5975</td>
+              <td style="padding:12px 14px;">0.8232</td>
+              <td style="padding:12px 14px;">70.06%</td>
+              <td style="padding:12px 14px;">0.7414</td>
+              <td style="padding:12px 14px;">0.9062</td>
+              <td style="padding:12px 14px;">0.1434</td>
+              <td style="padding:12px 14px;">0.8156</td>
+              <td style="padding:12px 14px;">0.5810</td>
               <td style="padding:12px 14px;"><span style="color:var(--muted); font-size:0.8rem;">Neural Baseline</span></td>
             </tr>
             <tr style="border-top:1px solid var(--border);">
               <td style="padding:12px 14px;">Naive Bayes</td>
-              <td style="padding:12px 14px;">0.5221</td>
-              <td style="padding:12px 14px;">52.63%</td>
-              <td style="padding:12px 14px;">0.8773</td>
-              <td style="padding:12px 14px;">0.4097</td>
-              <td style="padding:12px 14px;">0.8439</td>
-              <td style="padding:12px 14px;">0.5586</td>
-              <td style="padding:12px 14px;">0.7401</td>
+              <td style="padding:12px 14px;">0.5325</td>
+              <td style="padding:12px 14px;">53.13%</td>
+              <td style="padding:12px 14px;">0.8860</td>
+              <td style="padding:12px 14px;">0.4113</td>
+              <td style="padding:12px 14px;">0.8566</td>
+              <td style="padding:12px 14px;">0.5618</td>
+              <td style="padding:12px 14px;">0.7544</td>
               <td style="padding:12px 14px;"><span style="color:var(--muted); font-size:0.8rem;">Probabilistic Baseline</span></td>
             </tr>
           </tbody>
         </table>
-        <!-- ====================================================
-             VISUAL MODEL DIAGNOSTICS & PLOTS
-             ==================================================== -->
-        <div class="visual-plots-section" style="margin-top:40px;">
-          <h3 style="font-size:1.2rem; font-weight:700; color:var(--text); margin-bottom:18px;">Visual Model Diagnostics & Performance Plots</h3>
-          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(310px, 1fr)); gap:24px;">
-            
-            <!-- Confusion Matrix Card -->
-            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);">
-              <h4 style="font-size:1rem; font-weight:600; color:var(--text); margin-bottom:12px;">XGBoost Confusion Matrix</h4>
-              <img src="assets/confusion_matrix.png" alt="XGBoost Confusion Matrix" style="width:100%; height:auto; border-radius:8px; border:1px solid var(--border);" />
-              <p style="font-size:0.83rem; color:var(--muted); margin-top:12px; line-height:1.4;">
-                Heatmap displaying True Negatives (336), False Positives (215), False Negatives (132), and True Positives (1,361) on the untouched 30% Holdout dataset (2,044 molecules).
-              </p>
-            </div>
- 
-            <!-- ROC Curve Card -->
-            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);">
-              <h4 style="font-size:1rem; font-weight:600; color:var(--text); margin-bottom:12px;">ROC Curve Analysis</h4>
-              <img src="assets/roc_curve.png" alt="ROC Curve Analysis" style="width:100%; height:auto; border-radius:8px; border:1px solid var(--border);" />
-              <p style="font-size:0.83rem; color:var(--muted); margin-top:12px; line-height:1.4;">
-                Receiver Operating Characteristic (ROC) curve displaying True Positive Rate vs False Positive Rate (XGBoost AUC = 0.8699 vs Random Forest AUC = 0.8639).
-              </p>
-            </div>
- 
-            <!-- Model Comparison Bar Chart Card -->
-            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px; box-shadow:0 4px 6px -1px rgba(0,0,0,0.05);">
-              <h4 style="font-size:1rem; font-weight:600; color:var(--text); margin-bottom:12px;">Model Benchmark Comparison</h4>
-              <img src="assets/model_comparison.png" alt="Model Benchmark Comparison" style="width:100%; height:auto; border-radius:8px; border:1px solid var(--border);" />
-              <p style="font-size:0.83rem; color:var(--muted); margin-top:12px; line-height:1.4;">
-                Grouped bar chart comparing Holdout F1-Score, Accuracy, and ROC-AUC across all 5 evaluated machine learning algorithms.
-              </p>
-            </div>
- 
+      </div>
+
+      <!-- ====================================================
+           DYNAMIC VISUAL DIAGNOSTICS STUDIO (INTERACTIVE)
+           ==================================================== -->
+      <div class="diagnostics-studio">
+        
+        <div class="studio-header">
+          <div class="studio-title-group">
+            <h3>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+              Interactive Model Diagnostics Studio
+            </h3>
+            <p>Explore real-time interactive confusion matrix, ROC curves, and dynamic multi-model benchmarks.</p>
+          </div>
+
+          <div class="studio-tabs" role="tablist">
+            <button class="studio-tab-btn active" data-tab="tab-cm">
+              🎯 Confusion Matrix
+            </button>
+            <button class="studio-tab-btn" data-tab="tab-roc">
+              📈 ROC Curve
+            </button>
+            <button class="studio-tab-btn" data-tab="tab-benchmark">
+              📊 Model Benchmark
+            </button>
+            <button class="studio-tab-btn" data-tab="tab-radar">
+              🕸️ Metric Radar
+            </button>
           </div>
         </div>
+
+        <!-- TAB 1: INTERACTIVE CONFUSION MATRIX -->
+        <div class="tab-content-panel active" id="tab-cm">
+          <div class="cm-layout-grid">
+            <div class="cm-container">
+              
+              <div class="cm-controls-bar">
+                <button class="cm-toggle-btn active" id="cmCountBtn">Raw Counts</button>
+                <button class="cm-toggle-btn" id="cmPercentBtn">Percentages (%)</button>
+              </div>
+
+              <div class="cm-axis-header">Predicted Class Label</div>
+
+              <div class="cm-axis-y-wrapper">
+                <div class="cm-axis-y-label">Actual True Class</div>
+
+                <div class="cm-matrix-grid">
+                  <!-- True Inactive (TN) -->
+                  <div class="cm-cell tn" data-tooltip="Correctly identified 336 non-inhibitors">
+                    <div class="cm-cell-val" id="cmTN" data-raw="336" data-pct="16.4%">336</div>
+                    <div class="cm-cell-tag">True Inactive (TN)</div>
+                    <div class="cm-cell-sub">Specificity: 61.0%</div>
+                  </div>
+
+                  <!-- False Active (FP) -->
+                  <div class="cm-cell fp" data-tooltip="False Alarm: 215 inactive molecules predicted active">
+                    <div class="cm-cell-val" id="cmFP" data-raw="215" data-pct="10.5%">215</div>
+                    <div class="cm-cell-tag">False Active (FP)</div>
+                    <div class="cm-cell-sub">Type I Error</div>
+                  </div>
+
+                  <!-- False Inactive (FN) -->
+                  <div class="cm-cell fn" data-tooltip="Missed Active: 132 true inhibitors predicted inactive">
+                    <div class="cm-cell-val" id="cmFN" data-raw="132" data-pct="6.5%">132</div>
+                    <div class="cm-cell-tag">False Inactive (FN)</div>
+                    <div class="cm-cell-sub">Type II Error</div>
+                  </div>
+
+                  <!-- True Active (TP) -->
+                  <div class="cm-cell tp" data-tooltip="Correctly identified 1,361 bioactive inhibitors">
+                    <div class="cm-cell-val" id="cmTP" data-raw="1361" data-pct="66.6%">1361</div>
+                    <div class="cm-cell-tag">True Active (TP)</div>
+                    <div class="cm-cell-sub">Sensitivity: 91.2%</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Side Metrics Gauges -->
+            <div class="cm-metrics-panel">
+              <div class="metric-gauge-card">
+                <div class="metric-gauge-header">
+                  <span class="metric-gauge-name">Accuracy (ACC)</span>
+                  <span class="metric-gauge-value">83.02%</span>
+                </div>
+                <div class="metric-gauge-bar-bg">
+                  <div class="metric-gauge-bar-fill" style="width:83.02%; background:linear-gradient(90deg, #3b82f6, #1d4ed8);"></div>
+                </div>
+                <div class="metric-gauge-formula">Formula: (TP + TN) / Total Samples = 1,697 / 2,044</div>
+              </div>
+
+              <div class="metric-gauge-card">
+                <div class="metric-gauge-header">
+                  <span class="metric-gauge-name">Sensitivity / Recall (TPR)</span>
+                  <span class="metric-gauge-value">91.16%</span>
+                </div>
+                <div class="metric-gauge-bar-bg">
+                  <div class="metric-gauge-bar-fill" style="width:91.16%; background:linear-gradient(90deg, #10b981, #059669);"></div>
+                </div>
+                <div class="metric-gauge-formula">Formula: TP / (TP + FN) = 1,361 / 1,493</div>
+              </div>
+
+              <div class="metric-gauge-card">
+                <div class="metric-gauge-header">
+                  <span class="metric-gauge-name">Precision (PPV)</span>
+                  <span class="metric-gauge-value">86.36%</span>
+                </div>
+                <div class="metric-gauge-bar-bg">
+                  <div class="metric-gauge-bar-fill" style="width:86.36%; background:linear-gradient(90deg, #6366f1, #4f46e5);"></div>
+                </div>
+                <div class="metric-gauge-formula">Formula: TP / (TP + FP) = 1,361 / 1,576</div>
+              </div>
+
+              <div class="metric-gauge-card">
+                <div class="metric-gauge-header">
+                  <span class="metric-gauge-name">Holdout F1-Score (Harmonic Mean)</span>
+                  <span class="metric-gauge-value" style="color:var(--success);">0.8869</span>
+                </div>
+                <div class="metric-gauge-bar-bg">
+                  <div class="metric-gauge-bar-fill" style="width:88.69%; background:linear-gradient(90deg, #10b981, #16a34a);"></div>
+                </div>
+                <div class="metric-gauge-formula">Formula: 2 * (Prec * Rec) / (Prec + Rec)</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- TAB 2: INTERACTIVE ROC CURVE (CANVAS) -->
+        <div class="tab-content-panel" id="tab-roc">
+          <div class="chart-studio-card">
+            <div class="chart-header-row">
+              <div>
+                <h4 style="font-size:1.05rem; font-weight:700; color:var(--text);">Receiver Operating Characteristic (ROC) Curve</h4>
+                <div class="chart-subtitle">Comparing True Positive Rate vs False Positive Rate across classification thresholds</div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:380px;">
+              <canvas id="rocChartCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 3: DYNAMIC MODEL BENCHMARK (CANVAS) -->
+        <div class="tab-content-panel" id="tab-benchmark">
+          <div class="chart-studio-card">
+            <div class="chart-header-row">
+              <div>
+                <h4 style="font-size:1.05rem; font-weight:700; color:var(--text);">5-Model Performance Benchmark</h4>
+                <div class="chart-subtitle">Interactive comparison of Holdout F1-Score, Accuracy, and ROC-AUC</div>
+              </div>
+              <div class="chart-filter-chips">
+                <button class="chart-chip active" data-metric="all">All Metrics</button>
+                <button class="chart-chip" data-metric="f1">F1-Score</button>
+                <button class="chart-chip" data-metric="acc">Accuracy</button>
+                <button class="chart-chip" data-metric="auc">ROC-AUC</button>
+              </div>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:380px;">
+              <canvas id="benchmarkChartCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB 4: METRIC RADAR COMPARISON (CANVAS) -->
+        <div class="tab-content-panel" id="tab-radar">
+          <div class="chart-studio-card">
+            <div class="chart-header-row">
+              <div>
+                <h4 style="font-size:1.05rem; font-weight:700; color:var(--text);">Multi-Dimensional Model Radar</h4>
+                <div class="chart-subtitle">Holistic trade-off visualization between XGBoost and Random Forest</div>
+              </div>
+            </div>
+            <div class="chart-canvas-wrapper" style="height:380px;">
+              <canvas id="radarChartCanvas"></canvas>
+            </div>
+          </div>
+        </div>
+
       </div>
+
     </div>
   </section>
-
 
   <!-- ====================================================
        ABOUT
