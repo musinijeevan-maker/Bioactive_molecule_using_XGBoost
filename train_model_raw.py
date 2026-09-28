@@ -30,6 +30,10 @@ import pandas as pd
 import numpy as np
 import joblib
 
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors
 from rdkit import RDLogger
@@ -270,12 +274,82 @@ def main():
     print(f"    Mean 10-Fold CV  : {best_row['Mean CV F1']:.4f}", flush=True)
     print("*" * 40, flush=True)
 
-    # 7. Save best model and metadata
-    print("\n[7/7] Saving best model and metadata...", flush=True)
+    # 7. Save best model, plots, and metadata
+    print("\n[7/7] Saving best model, plots, and metadata...", flush=True)
     os.makedirs(MODEL_SAVE_DIR, exist_ok=True)
+    frontend_assets_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "frontend", "assets")
+    os.makedirs(frontend_assets_dir, exist_ok=True)
+
     model_file = os.path.join(MODEL_SAVE_DIR, "best_model.pkl")
     joblib.dump(trained_models[best_name], model_file)
     print(f"      Saved best model to: {model_file}", flush=True)
+
+    # Generate Confusion Matrix Plot
+    best_clf = trained_models[best_name]
+    y_pred_best = best_clf.predict(X_hold)
+    cm = confusion_matrix(y_hold, y_pred_best)
+
+    fig, ax = plt.subplots(figsize=(6, 5))
+    im = ax.imshow(cm, cmap='Blues')
+    ax.set_xticks([0, 1])
+    ax.set_yticks([0, 1])
+    ax.set_xticklabels(['Inactive (0)', 'Active (1)'], fontsize=11, fontweight='bold')
+    ax.set_yticklabels(['Inactive (0)', 'Active (1)'], fontsize=11, fontweight='bold')
+    plt.xlabel('Predicted Class', fontsize=12, labelpad=10, fontweight='bold')
+    plt.ylabel('Actual Class', fontsize=12, labelpad=10, fontweight='bold')
+    plt.title(f'{best_name} Confusion Matrix (Holdout Set)', fontsize=13, fontweight='bold', pad=15)
+
+    labels = [[f'TN = {cm[0,0]}\n(True Inactive)', f'FP = {cm[0,1]}\n(False Active)'],
+              [f'FN = {cm[1,0]}\n(False Inactive)', f'TP = {cm[1,1]}\n(True Active)']]
+
+    for i in range(2):
+        for j in range(2):
+            color = 'white' if cm[i, j] > (cm.max() / 2) else 'black'
+            ax.text(j, i, labels[i][j], ha='center', va='center', color=color, fontsize=10, fontweight='bold')
+
+    plt.colorbar(im)
+    plt.tight_layout()
+    cm_path_backend = os.path.join(MODEL_SAVE_DIR, "confusion_matrix.png")
+    cm_path_frontend = os.path.join(frontend_assets_dir, "confusion_matrix.png")
+    plt.savefig(cm_path_backend, dpi=300)
+    plt.savefig(cm_path_frontend, dpi=300)
+    plt.close()
+    print("      Saved confusion_matrix.png", flush=True)
+
+    # Generate Model Benchmark Comparison Chart
+    plt.figure(figsize=(9, 5.5))
+    models_list = res_df['Model'].tolist()
+    f1_list = res_df['Holdout F1'].tolist()
+    acc_list = res_df['Accuracy'].tolist()
+    auc_list = res_df['ROC-AUC'].tolist()
+
+    x = np.arange(len(models_list))
+    width = 0.25
+
+    plt.bar(x - width, f1_list, width, label='Holdout F1-Score', color='#1a6fdb')
+    plt.bar(x, acc_list, width, label='Accuracy', color='#0d9488')
+    plt.bar(x + width, auc_list, width, label='ROC-AUC', color='#6366f1')
+
+    plt.xlabel('Machine Learning Model', fontsize=11, fontweight='bold')
+    plt.ylabel('Performance Metric Value', fontsize=11, fontweight='bold')
+    plt.title('Model Benchmark Comparison (Holdout Evaluation)', fontsize=13, fontweight='bold', pad=15)
+    plt.xticks(x, models_list, fontsize=10, fontweight='bold')
+    plt.ylim(0, 1.05)
+    plt.legend(loc='upper right', fontsize=10)
+    plt.grid(axis='y', linestyle=':', alpha=0.6)
+
+    for i in range(len(models_list)):
+        plt.text(i - width, f1_list[i] + 0.01, f'{f1_list[i]:.3f}', ha='center', fontsize=8, rotation=90)
+        plt.text(i, acc_list[i] + 0.01, f'{acc_list[i]:.3f}', ha='center', fontsize=8, rotation=90)
+        plt.text(i + width, auc_list[i] + 0.01, f'{auc_list[i]:.3f}', ha='center', fontsize=8, rotation=90)
+
+    plt.tight_layout()
+    comp_path_backend = os.path.join(MODEL_SAVE_DIR, "model_comparison.png")
+    comp_path_frontend = os.path.join(frontend_assets_dir, "model_comparison.png")
+    plt.savefig(comp_path_backend, dpi=300)
+    plt.savefig(comp_path_frontend, dpi=300)
+    plt.close()
+    print("      Saved model_comparison.png", flush=True)
 
     metadata = {
         "best_model_name": best_name,
